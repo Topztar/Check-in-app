@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Tuple, Optional
+from typing import List
 
 class DeviceEnrollRequest(BaseModel):
     user_id: str
@@ -22,5 +22,5 @@ class ClockInRequest(BaseModel):
     shift_id: str
     device_id: str
     signature_b64: str
-    gps_coordinates: List[GPSCoordinate] = Field(..., min_items=1, max_items=10)
+    gps_coordinates: List[GPSCoordinate] = Field(..., min_length=1, max_length=10)
     image_bytes_b64: str
