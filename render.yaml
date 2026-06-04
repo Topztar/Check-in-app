@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: attendance-saas-api
+    env: python
+    buildCommand: "pip install -r requirements.txt && alembic upgrade head"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port 10000"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
