@@ -5,7 +5,8 @@ from app.presentation.api.schemas import (
     DeviceEnrollRequest,
     ChallengeRequest,
     BiometricLoginRequest,
-    ClockInRequest
+    ClockInRequest,
+    AdminLoginRequest
 )
 from app.application.auth_service import AuthService
 from app.domain.services.kalman_filter import GPSFilter
@@ -88,3 +89,10 @@ async def clock_in(
         "smoothed_location": {"lat": smoothed_lat, "lon": smoothed_lon},
         "liveness_session_id": session_id
     }
+
+@api_router.post("/admin/login", summary="管理員登入 API")
+async def api_admin_login(request: AdminLoginRequest):
+    # 此為模擬的 API 登入邏輯，真實環境應查詢資料庫驗證雜湊密碼
+    if request.username == "admin" and request.password == "admin123":
+        return {"message": "登入成功", "token": "mock-admin-jwt-token"}
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="帳號或密碼錯誤")

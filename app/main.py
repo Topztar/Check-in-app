@@ -3,6 +3,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 # 1. 初始化 DI 容器並設定 Wiring (依賴注入綁定)
 from app.infrastructure.containers import Container
@@ -18,6 +19,15 @@ def create_app() -> FastAPI:
         title="Enterprise Multi-Tenant Employee Attendance SaaS",
         description="Backend API for attendance tracking with biometric and geofencing capabilities.",
         version="1.0.0"
+    )
+    
+    # 加入 CORS Middleware 以允許前端通訊
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:3000", "https://attendance-saas-api.onrender.com"], # 允許來源 (包含本地端 React 預設 port)
+        allow_credentials=True, # 允許傳送 Cookie (例如 HttpOnly token)
+        allow_methods=["*"], # 允許所有 HTTP 方法 (GET, POST, PUT, DELETE, OPTIONS等)
+        allow_headers=["*"], # 允許所有 Header (包含 Authorization)
     )
     
     app.container = container

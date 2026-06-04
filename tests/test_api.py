@@ -63,3 +63,22 @@ def test_clock_in():
     assert response.json()["message"] == "打卡成功"
     assert "smoothed_location" in response.json()
     assert "liveness_session_id" in response.json()
+
+def test_admin_login():
+    payload = {
+        "username": "admin",
+        "password": "admin123"
+    }
+    response = client.post("/api/v1/admin/login", json=payload)
+    assert response.status_code == 200
+    assert response.json()["message"] == "登入成功"
+    assert "token" in response.json()
+
+def test_admin_login_fail():
+    payload = {
+        "username": "admin",
+        "password": "wrongpassword"
+    }
+    response = client.post("/api/v1/admin/login", json=payload)
+    assert response.status_code == 401
+    assert response.json()["detail"] == "帳號或密碼錯誤"

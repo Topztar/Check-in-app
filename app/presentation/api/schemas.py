@@ -24,3 +24,7 @@ class ClockInRequest(BaseModel):
     signature_b64: str
     gps_coordinates: List[GPSCoordinate] = Field(..., min_length=1, max_length=10)
     image_bytes_b64: str
+
+class AdminLoginRequest(BaseModel):
+    username: str
+    password: str
