@@ -14,3 +14,4 @@ fakeredis
 pytest
 pytest-asyncio
 aiosqlite
+jinja2
