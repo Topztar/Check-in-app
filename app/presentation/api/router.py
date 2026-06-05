@@ -6,13 +6,23 @@ from app.presentation.api.schemas import (
     ChallengeRequest,
     BiometricLoginRequest,
     ClockInRequest,
-    AdminLoginRequest
+    AdminLoginRequest,
+    AdminRegisterRequest
 )
 from app.application.auth_service import AuthService
 from app.domain.services.kalman_filter import GPSFilter
 from app.domain.services.geofencing import GeofenceService
 
+from sqlalchemy.future import select
+from app.domain.models import Tenant, User
+
+
 api_router = APIRouter()
+
+
+def get_db(request: Request):
+    return request.app.container.db()
+
 
 def get_redis_service(request: Request):
     return request.app.container.redis_service()
@@ -91,8 +101,42 @@ async def clock_in(
     }
 
 @api_router.post("/admin/login", summary="管理員登入 API")
-async def api_admin_login(request: AdminLoginRequest):
-    # 此為模擬的 API 登入邏輯，真實環境應查詢資料庫驗證雜湊密碼
-    if request.username == "admin" and request.password == "admin123":
-        return {"message": "登入成功", "token": "mock-admin-jwt-token"}
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="帳號或密碼錯誤")
+async def api_admin_login(request: AdminLoginRequest, db = Depends(get_db)):
+    async with db.session() as session:
+        stmt = select(User).where(User.email == request.username)
+        result = await session.execute(stmt)
+        user = result.scalars().first()
+        
+        if not user or not AuthService.verify_password(request.password, user.hashed_password):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="帳號或密碼錯誤")
+            
+        token = AuthService.create_access_token(data={"sub": str(user.id), "tenant_id": str(user.tenant_id), "role": user.role})
+        return {"message": "登入成功", "token": token}
+
+@api_router.post("/admin/register", summary="註冊新租戶與管理員")
+async def api_admin_register(request: AdminRegisterRequest, db = Depends(get_db)):
+    async with db.session() as session:
+        # Check if user already exists
+        stmt = select(User).where(User.email == request.email)
+        result = await session.execute(stmt)
+        if result.scalars().first():
+            raise HTTPException(status_code=400, detail="此 Email 已被註冊")
+            
+        # Create Tenant
+        new_tenant = Tenant(name=request.tenant_name)
+        session.add(new_tenant)
+        await session.flush() # To get tenant ID
+        
+        # Create User
+        hashed_pw = AuthService.get_password_hash(request.password)
+        new_user = User(
+            tenant_id=new_tenant.id,
+            email=request.email,
+            name=request.admin_name,
+            role="admin",
+            hashed_password=hashed_pw
+        )
+        session.add(new_user)
+        await session.commit()
+        
+        return {"message": "註冊成功，請導向登入頁面"}

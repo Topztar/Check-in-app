@@ -28,3 +28,9 @@ class ClockInRequest(BaseModel):
 class AdminLoginRequest(BaseModel):
     username: str
     password: str
+
+class AdminRegisterRequest(BaseModel):
+    tenant_name: str
+    admin_name: str
+    email: str
+    password: str

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企業級考勤系統 - 管理員註冊</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>建立新租戶與管理員</h2>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="tenant_name">公司/組織名稱</label>
+                <input type="text" id="tenant_name" name="tenant_name" required>
+            </div>
+            <div class="form-group">
+                <label for="admin_name">管理員姓名</label>
+                <input type="text" id="admin_name" name="admin_name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">管理員 Email (帳號)</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">密碼</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="login-btn">註冊</button>
+            <p id="register-message" class="error-message"></p>
+        </form>
+        <div style="text-align: center; margin-top: 15px;">
+            <a href="/admin/login" style="color: #4CAF50; text-decoration: none;">已有帳號？返回登入</a>
+        </div>
+    </div>
+    <script src="/static/register.js"></script>
+</body>
+</html>

@@ -16,3 +16,11 @@ async def admin_login_page(request: Request):
     return templates.TemplateResponse(
         request=request, name="admin_login.html"
     )
+
+
+@web_router.get("/admin/register")
+async def admin_register_page(request: Request):
+    return templates.TemplateResponse(
+        request=request, name="admin_register.html"
+    )
+
