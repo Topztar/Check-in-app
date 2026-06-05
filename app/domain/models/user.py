@@ -10,3 +10,4 @@ class User(Base, TenantAwareMixin):
     email = Column(String, nullable=False)
     name = Column(String, nullable=False)
     role = Column(String, nullable=False, default="employee") # admin, manager, employee
+    hashed_password = Column(String, nullable=True)

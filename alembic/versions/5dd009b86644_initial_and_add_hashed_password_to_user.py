@@ -1,18 +1,18 @@
-"""Initial tables
+"""initial and add hashed_password to user
 
-Revision ID: b6164066fff0
+Revision ID: 5dd009b86644
 Revises: 
-Create Date: 2026-06-03 04:00:59.035045
+Create Date: 2026-06-05 14:35:28.476667
 
 """
 from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
+
 
 # revision identifiers, used by Alembic.
-revision: str = 'b6164066fff0'
+revision: str = '5dd009b86644'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -27,7 +27,7 @@ def upgrade() -> None:
     sa.Column('start_time', sa.Time(), nullable=False),
     sa.Column('end_time', sa.Time(), nullable=False),
     sa.Column('geofence_type', sa.String(), nullable=False),
-    sa.Column('geofence_data', postgresql.JSONB(astext_type=Text()), nullable=False),
+    sa.Column('geofence_data', sa.JSON(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.Column('tenant_id', sa.UUID(), nullable=False),
@@ -48,6 +48,7 @@ def upgrade() -> None:
     sa.Column('email', sa.String(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('role', sa.String(), nullable=False),
+    sa.Column('hashed_password', sa.String(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.Column('tenant_id', sa.UUID(), nullable=False),

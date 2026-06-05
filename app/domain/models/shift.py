@@ -1,6 +1,7 @@
 import uuid
 from sqlalchemy import Column, String, Time, Date, ForeignKeyConstraint, Enum
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import JSON
 from app.infrastructure.database.base import Base, TenantAwareMixin
 
 class Shift(Base, TenantAwareMixin):
@@ -12,4 +13,4 @@ class Shift(Base, TenantAwareMixin):
     end_time = Column(Time, nullable=False)
     # GeoFence configuration (can be circle or polygon)
     geofence_type = Column(String, nullable=False) # "circle" or "polygon"
-    geofence_data = Column(JSONB, nullable=False) # {"lat": ..., "lng": ..., "radius": ...} or [{"lat": ..., "lng": ...}, ...]
+    geofence_data = Column(JSON, nullable=False) # {"lat": ..., "lng": ..., "radius": ...} or [{"lat": ..., "lng": ...}, ...]
