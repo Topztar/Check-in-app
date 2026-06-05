@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -24,27 +24,30 @@ def create_app() -> FastAPI:
     # 加入 CORS Middleware 以允許前端通訊
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:3000", "https://attendance-saas-api.onrender.com"], # 允許來源 (包含本地端 React 預設 port)
-        allow_credentials=True, # 允許傳送 Cookie (例如 HttpOnly token)
-        allow_methods=["*"], # 允許所有 HTTP 方法 (GET, POST, PUT, DELETE, OPTIONS等)
-        allow_headers=["*"], # 允許所有 Header (包含 Authorization)
+        allow_origins=["http://localhost:3000", "https://attendance-saas-api.onrender.com"], # 允許來源
+        allow_credentials=True, # 允許傳送 Cookie
+        allow_methods=["*"], # 允許所有 HTTP 方法
+        allow_headers=["*"], # 允許所有 Header
     )
     
     app.container = container
+
+    # --- 處理 Root URL (404 Not Found at /) ---
+    @app.get("/", include_in_schema=False)
+    async def root():
+        # 自動導向至後台登入頁面
+        return RedirectResponse(url="/admin/login")
 
     @app.get("/health", summary="Health Check")
     async def health_check():
         return JSONResponse(content={"status": "ok", "message": "服務運作正常"})
         
-    # 掛載靜態檔案 (Static Files)
-    # 將 /static 路徑映射到 app/presentation/static 資料夾
+    # 掛載靜態檔案
     BASE_DIR = Path(__file__).resolve().parent
     app.mount("/static", StaticFiles(directory=str(BASE_DIR / "presentation" / "static")), name="static")
     
-    # 註冊 API 路由 (前綴為 /api/v1)
+    # 註冊路由
     app.include_router(api_router, prefix="/api/v1")
-    
-    # 註冊 Web 頁面路由 (無特定前綴，或您也可以加上 /admin 前綴)
     app.include_router(web_router)
 
     return app
