@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # 1. 初始化 DI 容器並設定 Wiring (依賴注入綁定)
 from app.infrastructure.containers import Container
 container = Container()
+container.config.db.url.from_value("sqlite+aiosqlite:///./test.db")
 container.wire(packages=["app.presentation"])
 
 # 2. 引入 API Router 與 Web Router
