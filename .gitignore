@@ -2,5 +2,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 venv/
+.venv/
+# A-2：.env 已正確加入 .gitignore，.env.example 不加入（應提交至版本控制）
 .env
 .pytest_cache/
+# 本地開發資料庫（不應提交至版本控制）
+*.db
+# mypy 快取
+.mypy_cache/

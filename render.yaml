@@ -7,3 +7,18 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.0
+      # P2-5：資料庫 URL — 在 Render Dashboard 中設定為 PostgreSQL 連線字串
+      - key: DB_URL
+        sync: false
+      # P2-5：JWT 金鑰 — 使用 `openssl rand -hex 32` 產生並在 Dashboard 中設定
+      - key: JWT_SECRET_KEY
+        sync: false
+      # P2-5：JWT 演算法（預設 HS256）
+      - key: JWT_ALGORITHM
+        value: HS256
+      # P2-5：Token 有效期（分鐘）
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
+      # P2-5：正式環境關閉除錯模式
+      - key: DEBUG
+        value: "false"
