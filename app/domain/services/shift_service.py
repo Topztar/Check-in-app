@@ -47,47 +47,32 @@ class ShiftService:
 
         方法：
         - 以日期為單位，迭代工作期間跨越的每一天（通常僅 1-2 天）
-        - 對每天計算兩個夜班時段的交集：
-            時段 A：前一天 22:00 至當天 06:00
+        - 對每天計算一個夜班時段的交集：
             時段 B：當天 22:00 至隔天 06:00
         - 時間複雜度：O(工作天數)，實務上永遠 ≤ 2，等同 O(1)
         """
         total_seconds = 0.0
 
         # 計算工作期間跨越的日期集合
-        start_date = clock_in.date()
+        # 為了涵蓋昨天晚上的夜班，從 clock_in 的前一天開始算
+        start_date = clock_in.date() - timedelta(days=1)
         end_date = clock_out.date()
         current_date = start_date
 
         while current_date <= end_date:
-            # 夜班時段 A：昨天 22:00 → 今天 06:00
-            night_start_a = datetime.combine(
-                current_date - timedelta(days=1),
-                time(22, 0),
-                tzinfo=clock_in.tzinfo,
-            )
-            night_end_a = datetime.combine(
-                current_date,
-                time(6, 0),
-                tzinfo=clock_in.tzinfo,
-            )
-            total_seconds += ShiftService._intersect_seconds(
-                clock_in, clock_out, night_start_a, night_end_a
-            )
-
-            # 夜班時段 B：今天 22:00 → 明天 06:00
-            night_start_b = datetime.combine(
+            # 夜班時段：當天 22:00 → 明天 06:00
+            night_start = datetime.combine(
                 current_date,
                 time(22, 0),
                 tzinfo=clock_in.tzinfo,
             )
-            night_end_b = datetime.combine(
+            night_end = datetime.combine(
                 current_date + timedelta(days=1),
                 time(6, 0),
                 tzinfo=clock_in.tzinfo,
             )
             total_seconds += ShiftService._intersect_seconds(
-                clock_in, clock_out, night_start_b, night_end_b
+                clock_in, clock_out, night_start, night_end
             )
 
             current_date += timedelta(days=1)
