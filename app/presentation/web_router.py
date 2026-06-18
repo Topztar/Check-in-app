@@ -24,3 +24,11 @@ async def admin_register_page(request: Request):
         request=request, name="admin_register.html"
     )
 
+
+@web_router.get("/admin/dashboard")
+async def admin_dashboard_page(request: Request):
+    return templates.TemplateResponse(
+        request=request, name="admin_dashboard.html"
+    )
+
+

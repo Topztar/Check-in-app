@@ -17,6 +17,8 @@ from app.presentation.api.schemas import (
     ClockInRequest,
     AdminLoginRequest,
     AdminRegisterRequest,
+    ShiftCreateRequest,
+    EmployeeCreateRequest,
 )
 from app.presentation.api.dependencies import (
     get_current_user,
@@ -279,3 +281,66 @@ async def api_admin_register(request: AdminRegisterRequest, db=Depends(get_db)):
         email=request.email,
         password=request.password,
     )
+
+
+@api_router.get("/admin/dashboard/data", summary="獲取管理後台統計與資料")
+async def get_admin_dashboard_data(
+    current_user: dict[str, Any] = Depends(get_current_user),
+    db=Depends(get_db),
+):
+    if current_user.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="無權限存取管理後台",
+        )
+    tenant_id = current_user.get("tenant_id")
+    from app.application.admin_service import AdminService
+    admin_svc = AdminService(session_factory=db)
+    return await admin_svc.get_dashboard_data(tenant_id_str=tenant_id)
+
+
+@api_router.post("/admin/shifts", summary="建立新班別")
+async def create_new_shift(
+    request: ShiftCreateRequest,
+    current_user: dict[str, Any] = Depends(get_current_user),
+    db=Depends(get_db),
+):
+    if current_user.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="無權限執行此操作",
+        )
+    tenant_id = current_user.get("tenant_id")
+    from app.application.admin_service import AdminService
+    admin_svc = AdminService(session_factory=db)
+    return await admin_svc.create_shift(
+        tenant_id_str=tenant_id,
+        name=request.name,
+        start_time_str=request.start_time,
+        end_time_str=request.end_time,
+        geofence_type=request.geofence_type,
+        geofence_data=request.geofence_data,
+    )
+
+
+@api_router.post("/admin/employees", summary="註冊新員工")
+async def create_new_employee(
+    request: EmployeeCreateRequest,
+    current_user: dict[str, Any] = Depends(get_current_user),
+    db=Depends(get_db),
+):
+    if current_user.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="無權限執行此操作",
+        )
+    tenant_id = current_user.get("tenant_id")
+    from app.application.admin_service import AdminService
+    admin_svc = AdminService(session_factory=db)
+    return await admin_svc.create_employee(
+        tenant_id_str=tenant_id,
+        name=request.name,
+        email=request.email,
+        password=request.password,
+    )
+

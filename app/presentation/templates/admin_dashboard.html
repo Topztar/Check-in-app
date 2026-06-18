@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企業級考勤系統 - 管理後台</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-purple: #a855f7;
+            --accent-red: #ef4444;
+            --accent-orange: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', 'Noto Sans TC', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header Layout */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2.5rem;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-section h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #60a5fa, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+
+        .logo-section span {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+
+        .user-nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .tenant-badge {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #93c5fd;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            flex: 1;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--glass-shadow);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-info h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-info p {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            padding: 0.8rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-card:nth-child(1) .stat-icon { color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); }
+        .stat-card:nth-child(2) .stat-icon { color: var(--accent-purple); background: rgba(168, 85, 247, 0.1); }
+        .stat-card:nth-child(3) .stat-icon { color: var(--accent-green); background: rgba(16, 185, 129, 0.1); }
+
+        /* Dashboard Content Layout */
+        .dashboard-body {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--glass-shadow);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Tabs/Lists style */
+        .list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 450px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        /* Custom Scrollbar */
+        .list-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .list-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .list-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .list-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .list-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(3px);
+        }
+
+        .item-details h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .item-details p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-present { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-late { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-early_leave { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        /* Forms in columns */
+        .form-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #93c5fd;
+            margin-top: 1rem;
+            border-left: 3px solid var(--accent-blue);
+            padding-left: 0.5rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            padding: 1.2rem;
+            border-radius: 12px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        input, select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0.6rem 0.8rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            padding: 0.7rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            filter: brightness(1.1);
+        }
+
+        .status-msg {
+            font-size: 0.85rem;
+            text-align: center;
+            min-height: 1.2rem;
+        }
+
+        .status-success { color: var(--accent-green); }
+        .status-error { color: var(--accent-red); }
+
+        .time-badge {
+            font-size: 0.8rem;
+            color: #a7f3d0;
+            background: rgba(52, 211, 153, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo-section">
+            <h1>Enterprise Multi-Tenant Attendance</h1>
+            <span>管理後台 Dashboard</span>
+        </div>
+        <div class="user-nav">
+            <span class="tenant-badge" id="tenant-display">載入中...</span>
+            <button class="logout-btn" onclick="logout()">安全登出</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Stats Row -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>員工總數</h3>
+                    <p id="stat-users">0</p>
+                </div>
+                <div class="stat-icon">👥</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>班別數量</h3>
+                    <p id="stat-shifts">0</p>
+                </div>
+                <div class="stat-icon">⏰</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>註冊裝置</h3>
+                    <p id="stat-devices">0</p>
+                </div>
+                <div class="stat-icon">📱</div>
+            </div>
+        </div>
+
+        <!-- Dashboard body -->
+        <div class="dashboard-body">
+            <!-- Left Panel: Lists & Creations -->
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                <!-- Shifts & Employees management -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">⚙️ 班別與員工管理</h2>
+                    </div>
+
+                    <!-- Add Shift Form -->
+                    <div class="form-section-title">新增工作班別 (包含 GPS 地理圍欄)</div>
+                    <form id="shiftForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="shift_name">班別名稱</label>
+                                <input type="text" id="shift_name" placeholder="例如：日班、夜班" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="geofence_type">地理圍欄型態</label>
+                                <select id="geofence_type" required>
+                                    <option value="circle">圓形圍欄 (Circle)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="start_time">上班時間</label>
+                                <input type="text" id="start_time" placeholder="HH:MM (例如 09:00)" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="end_time">下班時間</label>
+                                <input type="text" id="end_time" placeholder="HH:MM (例如 18:00)" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="lat">圍欄中心緯度 (Latitude)</label>
+                                <input type="number" id="lat" step="any" placeholder="例如：25.033" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lng">圍欄中心經度 (Longitude)</label>
+                                <input type="number" id="lng" step="any" placeholder="例如：121.565" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="radius">允許打卡半徑 (公尺)</label>
+                            <input type="number" id="radius" placeholder="例如：100" required>
+                        </div>
+                        <button type="submit" class="btn-submit">建立班別</button>
+                        <p id="shift-status" class="status-msg"></p>
+                    </form>
+
+                    <!-- Add Employee Form -->
+                    <div class="form-section-title">新增員工帳號</div>
+                    <form id="employeeForm">
+                        <div class="form-group">
+                            <label for="emp_name">員工姓名</label>
+                            <input type="text" id="emp_name" placeholder="請輸入真實姓名" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="emp_email">Email 帳號</label>
+                            <input type="email" id="emp_email" placeholder="name@company.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="emp_password">登入密碼</label>
+                            <input type="password" id="emp_password" placeholder="請設定 6 位數以上密碼" required>
+                        </div>
+                        <button type="submit" class="btn-submit">註冊員工</button>
+                        <p id="employee-status" class="status-msg"></p>
+                    </form>
+                </div>
+
+                <!-- Shift List Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">🕒 現有班別列表</h2>
+                    </div>
+                    <div class="list-container" id="shifts-list">
+                        <!-- Dynamic content -->
+                        <p style="color: var(--text-secondary); text-align: center;">尚未定義任何班別</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Attendance Logs & Employee list -->
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                <!-- Attendance Records -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">📊 預防竄改打卡記錄 (即時)</h2>
+                    </div>
+                    <div class="list-container" id="attendance-list">
+                        <!-- Dynamic content -->
+                        <p style="color: var(--text-secondary); text-align: center;">尚無考勤記錄</p>
+                    </div>
+                </div>
+
+                <!-- Employee Directory -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">👤 員工通訊錄</h2>
+                    </div>
+                    <div class="list-container" id="users-list">
+                        <!-- Dynamic content -->
+                        <p style="color: var(--text-secondary); text-align: center;">尚未註冊任何員工</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS code directly in template for portability -->
+    <script>
+        // Check authentication on load
+        const token = localStorage.getItem('admin_token');
+        if (!token) {
+            window.location.href = '/admin/login';
+        }
+
+        // Fetch and render dashboard data
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/api/v1/admin/dashboard/data', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 401) {
+                    logout();
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('無法載入統計資料');
+                }
+
+                const data = await response.json();
+
+                // Render Tenant Name
+                document.getElementById('tenant-display').textContent = `企業客戶：${data.tenant_name}`;
+
+                // Render Stats
+                document.getElementById('stat-users').textContent = data.stats.users_count;
+                document.getElementById('stat-shifts').textContent = data.stats.shifts_count;
+                document.getElementById('stat-devices').textContent = data.stats.devices_count;
+
+                // Render Shifts List
+                const shiftsContainer = document.getElementById('shifts-list');
+                if (data.shifts && data.shifts.length > 0) {
+                    shiftsContainer.innerHTML = data.shifts.map(shift => {
+                        const start = shift.start_time.substring(0, 5);
+                        const end = shift.end_time.substring(0, 5);
+                        const lat = shift.geofence_data.lat || 0;
+                        const lng = shift.geofence_data.lng || 0;
+                        const radius = shift.geofence_data.radius || 0;
+
+                        return `
+                            <div class="list-item">
+                                <div class="item-details">
+                                    <h4>${shift.name}</h4>
+                                    <p>圍欄：${lat.toFixed(4)}, ${lng.toFixed(4)} (半徑 ${radius}m)</p>
+                                </div>
+                                <span class="time-badge">${start} - ${end}</span>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    shiftsContainer.innerHTML = `<p style="color: var(--text-secondary); text-align: center;">尚未定義任何班別</p>`;
+                }
+
+                // Render Employees List
+                const usersContainer = document.getElementById('users-list');
+                if (data.users && data.users.length > 0) {
+                    usersContainer.innerHTML = data.users.map(user => {
+                        return `
+                            <div class="list-item">
+                                <div class="item-details">
+                                    <h4>${user.name}</h4>
+                                    <p>${user.email}</p>
+                                </div>
+                                <span class="badge" style="background: rgba(255,255,255,0.05); color: #94a3b8; border: 1px solid var(--glass-border);">${user.role === 'admin' ? '管理員' : '一般員工'}</span>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    usersContainer.innerHTML = `<p style="color: var(--text-secondary); text-align: center;">尚未註冊任何員工</p>`;
+                }
+
+                // Render Attendance Logs
+                const attendanceContainer = document.getElementById('attendance-list');
+                if (data.attendance_records && data.attendance_records.length > 0) {
+                    attendanceContainer.innerHTML = data.attendance_records.map(record => {
+                        const clockIn = new Date(record.clock_in_time).toLocaleString('zh-TW', { hour12: false });
+                        const clockOut = record.clock_out_time ? new Date(record.clock_out_time).toLocaleString('zh-TW', { hour12: false }) : '尚未下班';
+                        
+                        let statusClass = 'badge-present';
+                        let statusText = '正常';
+                        if (record.status === 'late') {
+                            statusClass = 'badge-late';
+                            statusText = '遲到';
+                        } else if (record.status === 'early_leave') {
+                            statusClass = 'badge-early_leave';
+                            statusText = '早退';
+                        }
+
+                        return `
+                            <div class="list-item">
+                                <div class="item-details">
+                                    <h4>${record.user_name} (${record.shift_name})</h4>
+                                    <p>⏰ 上班：${clockIn}</p>
+                                    <p>⏰ 下班：${clockOut}</p>
+                                    <p>📍 經緯度：${record.latitude.toFixed(4)}, ${record.longitude.toFixed(4)}</p>
+                                </div>
+                                <span class="badge ${statusClass}">${statusText}</span>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    attendanceContainer.innerHTML = `<p style="color: var(--text-secondary); text-align: center;">尚無考勤記錄</p>`;
+                }
+
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // Form submission for creating a shift
+        document.getElementById('shiftForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const statusEl = document.getElementById('shift-status');
+            statusEl.className = 'status-msg';
+            statusEl.textContent = '傳送中...';
+
+            const name = document.getElementById('shift_name').value;
+            const startTime = document.getElementById('start_time').value;
+            const endTime = document.getElementById('end_time').value;
+            const geofenceType = document.getElementById('geofence_type').value;
+            const lat = parseFloat(document.getElementById('lat').value);
+            const lng = parseFloat(document.getElementById('lng').value);
+            const radius = parseFloat(document.getElementById('radius').value);
+
+            try {
+                const response = await fetch('/api/v1/admin/shifts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        start_time: startTime,
+                        end_time: endTime,
+                        geofence_type: geofenceType,
+                        geofence_data: { lat: lat, lng: lng, radius: radius }
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    statusEl.className = 'status-msg status-success';
+                    statusEl.textContent = '班別建立成功！';
+                    document.getElementById('shiftForm').reset();
+                    loadDashboardData();
+                } else {
+                    statusEl.className = 'status-msg status-error';
+                    statusEl.textContent = data.detail || '建立失敗';
+                }
+            } catch (error) {
+                statusEl.className = 'status-msg status-error';
+                statusEl.textContent = '網路或伺服器錯誤';
+            }
+        });
+
+        // Form submission for creating an employee
+        document.getElementById('employeeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const statusEl = document.getElementById('employee-status');
+            statusEl.className = 'status-msg';
+            statusEl.textContent = '傳送中...';
+
+            const name = document.getElementById('emp_name').value;
+            const email = document.getElementById('emp_email').value;
+            const password = document.getElementById('emp_password').value;
+
+            try {
+                const response = await fetch('/api/v1/admin/employees', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    statusEl.className = 'status-msg status-success';
+                    statusEl.textContent = '員工註冊成功！';
+                    document.getElementById('employeeForm').reset();
+                    loadDashboardData();
+                } else {
+                    statusEl.className = 'status-msg status-error';
+                    statusEl.textContent = data.detail || '註冊失敗';
+                }
+            } catch (error) {
+                statusEl.className = 'status-msg status-error';
+                statusEl.textContent = '網路或伺服器錯誤';
+            }
+        });
+
+        // Safe Logout
+        function logout() {
+            localStorage.removeItem('admin_token');
+            window.location.href = '/admin/login';
+        }
+
+        // Initialize dashboard
+        loadDashboardData();
+    </script>
+</body>
+</html>

@@ -115,3 +115,47 @@ def test_clock_in_requires_auth():
     response = client.post("/api/v1/attendance/clock-in", json=payload)
     # 無 JWT token 應被拒絕
     assert response.status_code in (401, 403, 422)
+
+
+def test_admin_dashboard_api():
+    # 1. 登入取得 token
+    login_payload = {
+        "username": "testadmin@company.com",
+        "password": "securepassword123"
+    }
+    login_res = client.post("/api/v1/admin/login", json=login_payload)
+    assert login_res.status_code == 200
+    token = login_res.json()["token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # 2. 測試 Dashboard Data
+    dash_res = client.get("/api/v1/admin/dashboard/data", headers=headers)
+    assert dash_res.status_code == 200
+    data = dash_res.json()
+    assert "tenant_name" in data
+    assert "stats" in data
+    assert "users" in data
+    assert "shifts" in data
+
+    # 3. 測試建立班別
+    shift_payload = {
+        "name": "Morning Shift",
+        "start_time": "09:00:00",
+        "end_time": "18:00:00",
+        "geofence_type": "circle",
+        "geofence_data": {"lat": 25.0, "lng": 121.0, "radius": 200.0}
+    }
+    shift_res = client.post("/api/v1/admin/shifts", json=shift_payload, headers=headers)
+    assert shift_res.status_code == 200
+    assert "shift_id" in shift_res.json()
+
+    # 4. 測試建立員工
+    emp_payload = {
+        "name": "John Doe",
+        "email": "johndoe@company.com",
+        "password": "employeepassword"
+    }
+    emp_res = client.post("/api/v1/admin/employees", json=emp_payload, headers=headers)
+    assert emp_res.status_code == 200
+    assert "employee_id" in emp_res.json()
+

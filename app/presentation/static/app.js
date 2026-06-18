@@ -23,10 +23,9 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             errorMsg.style.color = 'green';
             errorMsg.textContent = '登入成功！正在導向...';
             
-            // 儲存 JWT Token
             localStorage.setItem('admin_token', data.token);
-            // 導向未來可能擴充的管理後台 Dashboard
-            // window.location.href = '/admin/dashboard';
+            // 導向管理後台 Dashboard
+            window.location.href = '/admin/dashboard';
         } else {
             errorMsg.style.color = '#f44336';
             errorMsg.textContent = data.detail || '帳號或密碼錯誤';

@@ -34,3 +34,18 @@ class AdminRegisterRequest(BaseModel):
     admin_name: str
     email: str
     password: str
+
+
+class ShiftCreateRequest(BaseModel):
+    name: str
+    start_time: str  # Format: "HH:MM" or "HH:MM:SS"
+    end_time: str    # Format: "HH:MM" or "HH:MM:SS"
+    geofence_type: str  # "circle" or "polygon"
+    geofence_data: dict  # e.g. {"lat": 25.033, "lng": 121.565, "radius": 100.0}
+
+
+class EmployeeCreateRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+

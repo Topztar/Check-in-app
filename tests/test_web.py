@@ -17,3 +17,10 @@ def test_static_files():
     response = client.get("/static/app.js")
     assert response.status_code == 200
     assert "document.getElementById" in response.text
+
+
+def test_admin_dashboard_page():
+    response = client.get("/admin/dashboard")
+    assert response.status_code == 200
+    assert "管理後台" in response.text
+
